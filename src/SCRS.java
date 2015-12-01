@@ -171,4 +171,13 @@ public interface SCRS {
 	 * @return Return true if the operation is successfully, false otherwise
 	 */
 	boolean adminEditStudentRegisteredClass(ShibbolethAuth.Token token, int studentID, int courseID, String grading, String courseTerm); 
+	
+	/**
+	 * This interface should allow the admin to remove one registered class from a student's registered class's list.
+	 * @param token
+	 * @param studentID
+	 * @param courseID
+	 * @return Return true if the operation is successfully, false otherwise
+	 */
+	boolean adminDropStudentRegisteredClass(ShibbolethAuth.Token token, int studentID, int courseID);
 }
