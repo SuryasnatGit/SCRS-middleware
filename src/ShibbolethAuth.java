@@ -1,3 +1,4 @@
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -23,9 +24,9 @@ public class ShibbolethAuth {
 		final String timeStamp;
 	}
 	
-	private DBCoordinator dbCoordinator = new DBCoordinator();
+	private final DBCoordinator dbCoordinator = new DBCoordinator();
 	
-	public Token tokenGenerator(String x500, String password) {
+	public Token tokenGenerator(String x500, String password) throws ClassNotFoundException, SQLException {
 		String timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
 		
 		List<ArrayList<Object>> res = dbCoordinator.queryData("SELECT * FROM SHIBBOLETHAUTH WHERE X500ACCOUNT=\"" + x500 + "\" AND X500PASSWORD=\"" + password + "\"");
@@ -54,7 +55,7 @@ public class ShibbolethAuth {
 		else return undefinedToken;
 	}
 	
-	private boolean TokenAuth(Token token) {
+	private boolean TokenAuth(Token token) throws ClassNotFoundException, SQLException {
 		List<ArrayList<Object>> tmp;
 		if(token.type == Token.RoleType.STUDENT) {
 			tmp = dbCoordinator.queryData("SELECT * FROM STUDENT WHERE ID=\"" + token.id + "\"");
