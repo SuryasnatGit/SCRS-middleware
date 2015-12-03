@@ -8,8 +8,8 @@ public class Course {
 	private int credits;
 	private Date firstTime;
 	private Date lastTime;
-	private Time startTime;
-	private Time endTime;
+	private String startTime;
+	private String endTime;
 	private String classDays;
 	private String classType;
 	private String prereqs;
