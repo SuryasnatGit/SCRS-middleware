@@ -7,7 +7,7 @@ import java.util.List;
 
 
 public class Search { 
-  /* this will be removed just used for testing my code */  
+  /* this will be removed it is just used for testing my code */  
     public static void main (String args[]) throws ClassNotFoundException, SQLException {
         System.out.println("running");
         Search something = new Search();
