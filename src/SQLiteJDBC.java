@@ -11,8 +11,20 @@ public class SQLiteJDBC
       Class.forName("org.sqlite.JDBC");
       c = DriverManager.getConnection("jdbc:sqlite:SCRSDataBase.db");
       System.out.println("Opened database successfully");
-
+     
       stmt = c.createStatement();
+  
+     /*
+      * Use this if there are more changes to db schema
+      * u will need to drop these tables using code similar 
+      * to this for each of the tables 
+      * 
+      String createstmt = "DROP TABLE STUDENT";
+      stmt.executeUpdate(createstmt);
+      createstmt = "DROP TABLE COURSE";
+      stmt.executeUpdate(createstmt);
+      */
+      
       String createStudentTableSql = "CREATE TABLE STUDENT " +
                    "(ID INT PRIMARY KEY     NOT NULL," +
                    " FIRSTNAME      TEXT    NOT NULL, " + // Only contains alphabets
@@ -43,13 +55,14 @@ public class SQLiteJDBC
               " TITLE          CHAR(20) CHECK (TITLE IN ('Professor')), " +
               " SALARY         INT(1), " +
               " DEPARTMENT     CHAR(50) NOT NULL CHECK (DEPARTMENT IN ('CS')))"; 
-      stmt.executeUpdate(createInstructorTableSql);
+     stmt.executeUpdate(createInstructorTableSql);
       
       String createCourseTableSql = "CREATE TABLE COURSE " +
               "(ID INT PRIMARY KEY     NOT NULL," +
-              " NAME      	   CHAR(50) NOT NULL, " + // Only contains alphabets
+              " NAME         CHAR(50) NOT NULL, " + // Only contains alphabets
               " CREDITS        INT NOT NULL CHECK (CREDITS > 0 AND CREDITS <= 4), " + 
               " CAPACITY       INT NOT NULL CHECK (CAPACITY > 0 AND CAPACITY <= 30), " +
+              " TERM           CHAR(20) NOT NULL, " +
               " FIRSTDAY       DATE NOT NULL, " + // Format: mm/dd/yyyy
               " LASTDAY        DATE NOT NULL, " + // Format: mm/dd/yyyy
               " CLASSBEGINTIME CHAR(10) NOT NULL, " + // Format: "hh:mm"
@@ -60,8 +73,8 @@ public class SQLiteJDBC
               " PREREQUISITE   TEXT, " +
               " DESCRIPTION    TEXT NOT NULL, " +
               " DEPARTMENT     CHAR(50) NOT NULL CHECK (DEPARTMENT IN ('CS')))"; 
-      stmt.executeUpdate(createCourseTableSql);
-
+     stmt.executeUpdate(createCourseTableSql);
+      
       String createStudentCourseTableSql = "CREATE TABLE STUDENTANDCOURSE " +
               "(ID INTEGER PRIMARY KEY AUTOINCREMENT    NOT NULL," +
               " COURSEID  INT REFERENCES COURSE(ID) ON UPDATE CASCADE, " +
