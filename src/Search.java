@@ -5,6 +5,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.TypeConstraintException;
+
 
 public class Search { 
   /* this will be removed it is just used for testing my code */  
@@ -82,6 +84,10 @@ public class Search {
         res = db.queryData(sqlCmd);
         System.out.println(res);
         
+        resultList = DBProcessor.toStringArray(res);
+        
+        System.out.println(resultList);
+        /*
         ArrayList<String> temp = new ArrayList<String>();
         for(int j = 0;j < res.size();j++){
             System.out.println(res.get(j));
@@ -101,6 +107,7 @@ public class Search {
             resultList.add(temp);
             System.out.println(resultList);
         }
+        */
         return resultList;
         
 
