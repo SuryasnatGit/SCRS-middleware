@@ -1,4 +1,4 @@
-package edu.umn.csci5801;
+package edu.umn.csci5801.exceptions;
 
 /**
  * @author wclee

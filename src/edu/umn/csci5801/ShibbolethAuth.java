@@ -1,4 +1,5 @@
 package edu.umn.csci5801;
+
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -65,11 +66,11 @@ public class ShibbolethAuth {
 			tmp = dbCoordinator.queryData("SELECT * FROM ADMINISTRATOR WHERE ID=\"" + token.id + "\"");
 			if(tmp.size() == 0) return false;
 		}else if(token.type == Token.RoleType.BOTH){
-			boolean isValid = false;
+			boolean isValid = true;
 			tmp = dbCoordinator.queryData("SELECT * FROM ADMINISTRATOR WHERE ID=\"" + token.id + "\"");
-			if(tmp.size() == 0) isValid |= false;
+			if(tmp.size() == 0) isValid &= false;
 			tmp = dbCoordinator.queryData("SELECT * FROM STUDENT WHERE ID=\"" + token.id + "\"");
-			if(tmp.size() == 0) isValid |= false;
+			if(tmp.size() == 0) isValid &= false;
 			if(!isValid) return false;
 		}
 		

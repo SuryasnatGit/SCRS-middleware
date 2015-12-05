@@ -1,88 +1,81 @@
 # Student Table: 
 
-CREATE TABLE STUDENT 
-(ID INT PRIMARY KEY     NOT NULL,
-FIRSTNAME      TEXT    NOT NULL,
-LASTNAME       TEXT    NOT NULL,
-DATEOFBIRTH    DATE    NOT NULL,
-TYPE           CHAR(10) NOT NULL, 
-GENDER         CHAR(10), 
-ADVISOR        CHAR(20), 
-PLAN           CHAR(30) NOT NULL,
-CREDITS        INT      NOT NULL, 
-DEPARTMENT     CHAR(50) NOT NULL); 
+	CREATE TABLE STUDENT
+	  (ID INT PRIMARY KEY     NOT NULL,
+	  FIRSTNAME      TEXT    NOT NULL, // Only contains alphabets
+	  LASTNAME       TEXT    NOT NULL, // Only contains alphabets
+	  DATEOFBIRTH    DATE    NOT NULL, // Format: mm/dd/yyyy
+	  TYPE           CHAR(10) NOT NULL CHECK (TYPE IN ('Undergrad', 'Master', 'PHD')), // Seminar or Lecture  
+	  GENDER         CHAR(15) CHECK (GENDER IN ('Male', 'Female', 'Transgender')), // Male, Female or Transgender
+	  ADVISOR        CHAR(20),
+	  CREDITS        INT      NOT NULL CHECK (CREDITS >= 0), // Credits' value in [0, 1]
+	  DEPARTMENT     CHAR(50) NOT NULL CHECK (DEPARTMENT IN ('CS')));       
+
    
 # Administrator Table: 
-CREATE TABLE ADMINISTRATOR 
-(ID INT PRIMARY KEY     NOT NULL,
-FIRSTNAME      TEXT    NOT NULL, 
-LASTNAME       TEXT    NOT NULL, 
-DATEOFBIRTH    DATE    NOT NULL, 
-GENDER         CHAR(10),  
-DEPARTMENT     CHAR(50) NOT NULL); 
-// Student ID 
-// Firstname 
-// Lastname 
-// Date of birth, “sqldate” type 
-// Undergraduate, Master, or PHD 
-// Admin ID  
+
+	CREATE TABLE ADMINISTRATOR
+	  (ID INT PRIMARY KEY     NOT NULL,
+	  FIRSTNAME      TEXT    NOT NULL, // Only contains alphabets
+	  LASTNAME       TEXT    NOT NULL, // Only contains alphabets
+	  DATEOFBIRTH    DATE    NOT NULL, // Format: mm/dd/yyyy
+	  GENDER         CHAR(15) CHECK (GENDER IN ('Male', 'Female', 'Transgender')), 
+	  DEPARTMENT     CHAR(50) NOT NULL CHECK (DEPARTMENT IN ('CS')));
 
 # Instructor Table: 
-CREATE TABLE INSTRUCTOR 
-ID INT PRIMARY KEY     NOT NULL, 
-FIRSTNAME      TEXT    NOT NULL, 
-LASTNAME       TEXT    NOT NULL, 
-DATEOFBIRTH    DATE    NOT NULL, 
-GENDER         CHAR(10), 
-TITLE          CHAR(20),
-// Associate Professor, Professor 
-SALARY         INT(1), 
-DEPARTMENT     CHAR(50) NOT NULL); 
-   
+
+	CREATE TABLE INSTRUCTOR
+	  (ID INT PRIMARY KEY     NOT NULL,
+	  FIRSTNAME      TEXT    NOT NULL,  // Only contains alphabets
+	  LASTNAME       TEXT    NOT NULL,  // Only contains alphabets
+	  DATEOFBIRTH    DATE    NOT NULL,  // Format: mm//dd/yyyy
+	  GENDER         CHAR(15) CHECK (GENDER IN ('Male', 'Female', 'Transgender')),
+	  TITLE          CHAR(20) CHECK (TITLE IN ('Professor')),
+	  SALARY         INT(1),
+	  DEPARTMENT     CHAR(50) NOT NULL CHECK (DEPARTMENT IN ('CS')));   
+
 # Course Table: 
-CREATE TABLE COURSE 
-(ID INT PRIMARY KEY     NOT NULL, 
-NAME 
-   CHAR(50) NOT NULL, 
-CREDITS        INT NOT NULL, 
-FIRSTDAY        DATE NOT NULL,
-// The date of the first class 
-LASTDAY         DATE NOT NULL,
-// The date of the last class 
-CLASSBEGINTIME     CHAR(10) NOT NULL,
-//  E.g. 9:00am 
-CLASSENDTIME         CHAR(10) NOT NULL,
-//  E.g. 11:00am 
-ROUTINES    CHAR(50) NOT NULL,
-//  E.g. Tu, Th 
-LOCATION       CHAR(100) NOT NULL, 
-TYPE           CHAR(20) NOT NULL,
-//   on Campus or Unite 
-PREREQUISITE   TEXT, 
-DESCRIPTION    TEXT NOT NULL,  
-DEPARTMENT     CHAR(50) NOT NULL); 
+
+	CREATE TABLE COURSE
+	  (ID INT PRIMARY KEY     NOT NULL,
+	  NAME      	  CHAR(50) NOT NULL, // Only contains alphabets
+	  CREDITS        INT NOT NULL CHECK (CREDITS > 0 AND CREDITS <= 4),
+	  CAPACITY       INT NOT NULL CHECK (CAPACITY > 0 AND CAPACITY <= 30),
+	  FIRSTDAY       DATE NOT NULL, // Format: mm/dd/yyyy
+	  LASTDAY        DATE NOT NULL, // Format: mm/dd/yyyy
+	  CLASSBEGINTIME CHAR(10) NOT NULL, // Format: "hh:mm"
+	  CLASSENDTIME   CHAR(10) NOT NULL, " + // Format: "hh:mm"
+	  ROUTINES       CHAR(15) NOT NULL, // Format: "Tu, Fri"
+	  LOCATION       CHAR(100) NOT NULL, // Format: E.g. East Bank KHKH3-301
+	  TYPE           CHAR(20) NOT NULL CHECK (TYPE IN ('Seminar', 'Lecture')), // Seminar or Lecture
+	  PREREQUISITE   TEXT,
+	  DESCRIPTION    TEXT NOT NULL,
+	  DEPARTMENT     CHAR(50) NOT NULL CHECK (DEPARTMENT IN ('CS'))); 
+
+*The courseID in queryClass will be a negative number -1*
  
 # StudentAndCourse Table: 
-CREATE TABLE STUDENTANDCOURSE 
-(ID INTEGER PRIMARY KEY AUTOINCREMENT    NOT NULL, 
-COURSEID  INT REFERENCES COURSE(ID) ON UPDATE CASCADE, 
-GRADING CHAR(10) NOT NULL,
-//  A/F, S/N, AUD 
-COURSETERM CHAR(20) NOT NULL, 
-STUDENTID INT REFERENCES STUDENT(ID) ON UPDATE CASCADE); 
-   
+
+	CREATE TABLE STUDENTANDCOURSE
+	  (ID INTEGER PRIMARY KEY AUTOINCREMENT    NOT NULL,
+	  COURSEID  INT REFERENCES COURSE(ID) ON UPDATE CASCADE,
+	  GRADING CHAR(10) NOT NULL CHECK (GRADING IN ('A-F', 'S/N', 'AUD')), // A-F S/N Aud
+	  COURSETERM CHAR(20) NOT NULL, // Format: E.g. Spring2015, Fall2016
+	  STUDENTID INT REFERENCES STUDENT(ID) ON UPDATE CASCADE);   
  
 # InstructorAndCourse Table: 
-CREATE TABLE INSTRUCTORANDCOURSE (ID INTEGER PRIMARY KEY AUTOINCREMENT    NOT NULL, 
-COURSEID  INT REFERENCES COURSE(ID) ON UPDATE CASCADE,  
-INSTRUCTORID INT REFERENCES STUDENT(ID) ON UPDATE CASCADE); 
+
+	CREATE TABLE INSTRUCTORANDCOURSE
+	  ID INTEGER PRIMARY KEY AUTOINCREMENT    NOT NULL,
+	  COURSEID  INT REFERENCES COURSE(ID) ON UPDATE CASCADE,
+	  INSTRUCTORID INT REFERENCES INSTRUCTOR(ID) ON UPDATE CASCADE);
  
 # ShibbolethAuth Table: 
-CREATE TABLE SHIBBOLETHAUTH 
-(ID INTEGER PRIMARY KEY AUTOINCREMENT    NOT NULL, 
-X500ACCOUNT    CHAR(50) NOT NULL, 
-X500PASSWORD   CHAR(20) NOT NULL, 
-USERID         INT NOT NULL, // If the user is either student and administrator, we just 
-store its administrator's ID 
-USERTYPE       CHAR(10) NOT NULL)  // STUDENT, ADMIN, and BOTH are valid 
-types 
+
+	CREATE TABLE SHIBBOLETHAUTH
+	  (ID INTEGER PRIMARY KEY AUTOINCREMENT    NOT NULL,
+	  X500ACCOUNT    CHAR(50) NOT NULL, // Only contains alphabets and numbers
+	  X500PASSWORD   CHAR(20) NOT NULL, // Only contains alphabets and numbers
+	  USERID         INT NOT NULL, // If the user is either student and administrator, we just store its administrator's ID
+	  USERTYPE       CHAR(10) NOT NULL CHECK (USERTYPE IN ('STUDENT', 'ADMIN', 'BOTH'))); // STUDENT, ADMIN, and BOTH
+
