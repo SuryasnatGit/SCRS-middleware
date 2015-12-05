@@ -1,3 +1,4 @@
+package edu.umn.csci5801;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

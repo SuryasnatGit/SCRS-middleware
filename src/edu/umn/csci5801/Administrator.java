@@ -1,3 +1,4 @@
+package edu.umn.csci5801;
 
 public class Administrator extends People{
 	private String department;

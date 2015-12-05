@@ -1,3 +1,5 @@
+package edu.umn.csci5801;
+
 /**
  * @author wclee
  *
