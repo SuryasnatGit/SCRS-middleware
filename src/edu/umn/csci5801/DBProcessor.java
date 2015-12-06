@@ -1,5 +1,7 @@
 package edu.umn.csci5801;
 import java.util.List;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 /**
@@ -33,7 +35,9 @@ public final class DBProcessor {
         			strList.add( (String) fields  );
         		else if(fields instanceof Integer)
         			strList.add( (String) fields.toString());
-        		else 
+        		else if(fields instanceof Date)
+        			strList.add( (new SimpleDateFormat("MM/dd/yyyy")).format(fields)  );
+          		else 
         		{
         			throw new ClassCastException("Could not cast: " + fields );
         		}
