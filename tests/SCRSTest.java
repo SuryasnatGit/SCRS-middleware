@@ -311,24 +311,93 @@ public class SCRSTest {
 	}
 
 	@Test
-	public void testAdminEditClass() {
+	public void testAdminEditClass() throws Exception{
+		Token adminToken = shibboleth.tokenGenerator("Abc1005","5000");
+		boolean resultExpected= true;
+		boolean resultActual;
+		System.out.println("11-ok");
+		
+		//Since modify, i am giving info randomly.
+		resultActual=scrs.adminEditClass(adminToken, 1, "Advanced Algorithm ", 5, "Yijia Zhang ", "9/1/2014 ","12/12/2014 ",
+				"8:45 AM ", "9:30 AM ","Tu, Fri ", "East Bank ", "Lecture ", "Algorithm and Data Structure ",
+				"Good Good Good Class ", "CS "); 
+
+		if (resultExpected && resultActual)
+		{
+			System.out.println("testStudentEditClass passed! Nice!");
+		}
+		else
+		{
+			fail("Actual result is not the expected result!!!");
+		}
+		//fail("Not yet implemented");
+	}
+
+	@Test
+	public void testAdminAddStudentToClass() throws Exception{
+		Token adminToken = shibboleth.tokenGenerator("Abc1005","5000");
+		boolean resultExpected= true;
+		boolean resultActual;
+		System.out.println("12-ok");
+		
+		//Since modify, i am giving info randomly.
+		resultActual=scrs.adminAddStudentToClass(adminToken, 1, 2, "A-F", "Fall2015"); 
+		
+		if (resultExpected && resultActual)
+		{
+			System.out.println("testStudentEditClass passed! Nice!");
+		}
+		else
+		{
+			fail("Actual result is not the expected result!!!");
+		}
+		//fail("Not yet implemented");
+	}
+
+	@Test
+	public void testAdminEditStudentRegisteredClass() throws Exception{
+		Token adminToken = shibboleth.tokenGenerator("Abc1005","5000");
+		boolean resultExpected= true;
+		boolean resultActual;
+		System.out.println("13-ok");
+		
+		//Since modify, i am giving info randomly.
+		resultActual=scrs.adminEditStudentRegisteredClass(adminToken, 1, 2, "S/N", "Fall2016"); 
+		
+		if (resultExpected && resultActual)
+		{
+			System.out.println("testStudentEditClass passed! Nice!");
+		}
+		else
+		{
+			fail("Actual result is not the expected result!!!");
+		}
+		
 		
 		//fail("Not yet implemented");
 	}
 
 	@Test
-	public void testAdminAddStudentToClass() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testAdminEditStudentRegisteredClass() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testAdminDropStudentRegisteredClass() {
-		fail("Not yet implemented");
+	public void testAdminDropStudentRegisteredClass() throws Exception{
+		Token adminToken = shibboleth.tokenGenerator("Abc1005","5000");
+		boolean resultExpected= true;
+		boolean resultActual;
+		System.out.println("14-ok");
+		
+		//Since modify, i am giving info randomly.
+		resultActual=scrs.adminDropStudentRegisteredClass(adminToken, 1, 1); 
+	
+		if (resultExpected && resultActual)
+		{
+			System.out.println("testStudentEditClass passed! Nice!");
+		}
+		else
+		{
+			fail("Actual result is not the expected result!!!");
+		}
+		
+		
+		//fail("Not yet implemented");
 	}
 
 }
