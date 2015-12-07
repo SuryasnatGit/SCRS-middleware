@@ -1,6 +1,7 @@
 package edu.umn.csci5801;
 import java.util.List;
 import java.sql.Date;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
@@ -46,6 +47,13 @@ public final class DBProcessor {
         	listOfStrList.add(strList);
         }
         return listOfStrList;
+	}
+	
+	public static ArrayList<ArrayList<String>> runQuery(String sqlCmd) throws SQLException, ClassNotFoundException
+	{
+		DBCoordinator db = new DBCoordinator();
+		List<ArrayList<Object>> result = db.queryData(sqlCmd);
+		return toStringArray(result);
 	}
 
 }
