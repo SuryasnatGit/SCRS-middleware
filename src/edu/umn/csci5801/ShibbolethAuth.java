@@ -6,7 +6,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Class that handles authentication by interacting with the ShibbolethAuth Database
+ *
+ */
 public class ShibbolethAuth {
+	/**
+	 * Class that strictly defines the Token type (using predefined RoleTypes) with a constructor.
+	 *
+	 */
 	static public class Token{
 		enum RoleType{
 			STUDENT,
@@ -26,8 +34,18 @@ public class ShibbolethAuth {
 		final String timeStamp;
 	}
 	
+	/**
+	 * Create one instance of DBCoordinator for auth and token generation
+	 */
 	private final DBCoordinator dbCoordinator = new DBCoordinator();
 	
+	/**
+	 * @param x500
+	 * @param password
+	 * @return
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 */
 	public Token tokenGenerator(String x500, String password) throws ClassNotFoundException, SQLException {
 		String timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
 		
@@ -57,6 +75,12 @@ public class ShibbolethAuth {
 		else return undefinedToken;
 	}
 	
+	/** Authenticates a given token with the database and ensures that the credentials exist in the database.
+	 * @param token
+	 * @return true if token is valid, false otherwise
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 */
 	private boolean TokenAuth(Token token) throws ClassNotFoundException, SQLException {
 		List<ArrayList<Object>> tmp;
 		if(token.type == Token.RoleType.STUDENT) {

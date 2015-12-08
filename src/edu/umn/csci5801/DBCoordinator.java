@@ -11,12 +11,29 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class that interfaces with the SQLite Database, ensures queries are not prone to SQL Injection 
+ * and that access to the database is controlled only through this class.
+ */
 public class DBCoordinator {
+	/**
+	 *  Connection object used to perform queries on the database. 
+	 */
+	
 	private Connection con;
+	/**
+	 *  Statement object that will be executed upon getting a connection to the database. 
+	 */
 	private Statement stmt;
 
-	// The query results will be store in List<ArrayList<Object>>, you need to
-	// do the type casting in your code
+	/**
+	 * @param sqlCmd the command to be executed.
+	 * @return A List of ArrayLists (each list containing a record of the returned data)
+	 * 		each ArrayList then contains objects that will later be downcasted.
+	 * 		An empty list might be returned if there are no records returned from the query.   
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 */
 	public List<ArrayList<Object>> queryData(String sqlCmd) throws ClassNotFoundException, SQLException {
 		List<ArrayList<Object>> res = new ArrayList<ArrayList<Object>>();
 		String originStr = sqlCmd;
@@ -53,6 +70,15 @@ public class DBCoordinator {
 		return res;
 	}
 
+	/**
+	 * This method deletes records from a database safely.
+	 * @param sqlCmd the delete query with ??? symbols for values.
+	 * @param dataList The data to be inserted into the SQLQuery (avoids SQL Injection)
+	 * @param typeList The types of data in the SQL Query
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 * @throws ParseException
+	 */
 	public void deleteData(String sqlCmd, ArrayList<String> dataList, ArrayList<Constants.PrimitiveDataType> typeList)
 			throws ClassNotFoundException, SQLException, ParseException {
 		sqlCmd = sqlCmd.toUpperCase();
@@ -91,6 +117,14 @@ public class DBCoordinator {
 		System.out.println("Operation done successfully");
 	}
 
+	/**
+	 * @param sqlCmd The SQL Query that contains the insert command. 
+	 * @param dataList The list of values to be added into the database.
+	 * @param typeList A list of values containing the types to be added into the database.
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 * @throws ParseException
+	 */
 	public void insertData(String sqlCmd, ArrayList<String> dataList, ArrayList<Constants.PrimitiveDataType> typeList)
 			throws ClassNotFoundException, SQLException, ParseException {
 		sqlCmd = sqlCmd.toUpperCase();
@@ -128,6 +162,16 @@ public class DBCoordinator {
 		System.out.println("Records created successfully");
 	}
 
+	/**
+	 * Function executes an update operation, and prevents the a query from being executed if the command is 
+	 * Not an update command. 
+	 * @param sqlCmd The query that will carry out the update operation
+	 * @param dataList The values that will be injected into the sqlCmd statement
+	 * @param typeList The list of types that are contained in the values.
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 * @throws ParseException
+	 */
 	public void updateData(String sqlCmd, ArrayList<String> dataList, ArrayList<Constants.PrimitiveDataType> typeList)
 			throws ClassNotFoundException, SQLException, ParseException {
 		sqlCmd = sqlCmd.toUpperCase();

@@ -1,24 +1,23 @@
 package edu.umn.csci5801;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.TypeConstraintException;
-
 public class Search {
-	
-	
-	/* this will be removed it is just used for testing my code */
-	public static void main(String args[]) throws SQLException, ClassNotFoundException {
-		System.out.println("running");
-		Search something = new Search();
-		something.searchClasses(-1, "", "", "", "CS", "", "Daniel Mack");
-	}
 
+	/**
+	 * @param courseID
+	 * @param courseName
+	 * @param location
+	 * @param term
+	 * @param department
+	 * @param classType
+	 * @param instructor
+	 * @return Return a List of Results, which are a list of strings containing the data. An empty string otherwise.
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 */
 	public List<ArrayList<String>> searchClasses(int courseID, String courseName, String location, String term,
 			String department, String classType, String instructor) throws ClassNotFoundException, SQLException {
 
@@ -73,12 +72,9 @@ public class Search {
 			sb.append(" = ");
 			sb.append(values.get(i));
 		}
-		// sb.append(";");
 		sqlCmd = sb.toString();
-		System.out.println(sqlCmd);
 
 		resultList = DBProcessor.runQuery(sqlCmd);
-        System.out.println(resultList);
 		return resultList;
 	}
 }

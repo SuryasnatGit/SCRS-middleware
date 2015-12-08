@@ -1,5 +1,9 @@
 package edu.umn.csci5801;
 
+/**
+ * Class that contains constants used by DbCoordinator
+ *
+ */
 public class Constants {
 	/*
 	 * Structures Declarations
@@ -9,6 +13,10 @@ public class Constants {
 		Student
 	}
 	
+	/**
+	 * PrimitiveDataTypes used by DbCoordinator
+	 *
+	 */
 	public enum PrimitiveDataType {
 		INT,
 		STRING,
