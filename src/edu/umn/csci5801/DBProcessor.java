@@ -1,10 +1,12 @@
 package edu.umn.csci5801;
 import java.util.List;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-
-import java.sql.Date;
+import java.time.DateTimeException;
+import java.util.Date;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  * @author wclee
@@ -102,6 +104,20 @@ public final class DBProcessor {
 		
 	}
 	
+	
+	/** Helper function that returns the age (difference in years between birth and current year)
+	 * @param dateOfBirth
+	 * @return
+	 */
+	public static int getAge(long dateOfBirth){
+		int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+		
+		Date date = new Date((long) dateOfBirth);
+		Calendar dob = Calendar.getInstance();
+		dob.setTime(date);
+		return currentYear - dob.get(Calendar.YEAR);
+	}
+	
 	/** Helper function that executes queries using a new DbCoordinator instance. 
 	 * @param sqlCmd
 	 * @return An array list of records, which are converted into a string array using toStringArray()
@@ -112,6 +128,63 @@ public final class DBProcessor {
 		DBCoordinator db = new DBCoordinator();
 		List<ArrayList<Object>> result = db.queryData(sqlCmd);
 		return toStringArray(result);
+	}
+	
+	
+	/** Helper function that executes queries and changes Date of Birth -> Age
+	 * @param sqlCmd
+	 * @return
+	 * @throws SQLException
+	 * @throws ClassNotFoundException
+	 */
+	public static ArrayList<ArrayList<String>> runQueryWithAge(String sqlCmd) throws SQLException, ClassNotFoundException {
+		DBCoordinator db = new DBCoordinator();
+		List<ArrayList<Object>> result = db.queryData(sqlCmd);
+		
+		for(ArrayList<Object> record : result)
+		{
+			long dateOfBirth = (long) record.get(3);
+			record.set(3, getAge(dateOfBirth)); // age is at index 3.
+		}
+
+		return toStringArray(result);
+	}
+	
+	/** Helper function that allows a date to be checked if it is within range. 
+	 * @param term e.g Fall2015 or Spring2014 
+	 * @param currentDate of type java.Util.Date object. Any date would work. 
+	 * @return Boolean true if date is within the term range, false otherwise.
+	 * @throws ParseException
+	 */
+	public static boolean isDateWithinRange(String term, Date currentDate) throws ParseException
+	{
+		String beginRegistrationDate;
+		String endRegistrationDate;
+		
+		String termYear = term.substring(4, 8);
+		
+		if (term.toLowerCase().trim().startsWith("fall")){
+			beginRegistrationDate = "07/01/";
+			endRegistrationDate = "09/01";
+		}
+		else if(term.toLowerCase().trim().startsWith("spring")){
+			beginRegistrationDate = "12/01";
+			endRegistrationDate = "02/01";
+		}
+		else
+		{
+			throw new ParseException("Invalid term", 4);
+		}
+		
+		beginRegistrationDate += termYear;
+		endRegistrationDate += termYear;
+		
+		SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
+		
+		Date dateStart = format.parse(beginRegistrationDate); 
+		Date dateEnd = format.parse(endRegistrationDate);
+		
+		return currentDate.after(dateStart) && currentDate.before(dateEnd);
 	}
 
 }
