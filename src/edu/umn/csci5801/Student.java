@@ -24,17 +24,6 @@ public class Student extends People {
 	private List<ArrayList<String>> resultList;
 	private String sqlCmd;
 	
-	/* this will be removed it is just used for testing my code */
-	public static void main(String args[]) throws ParseException,SQLException, ClassNotFoundException {
-		System.out.println("running");
-		Student something = new Student();
-	//	something.queryRegistrationHistory(0);
-	//	something.queryStudentPersonalData(0);
-	//something.studentAddClass(0, 2, "S/N","Fall2015");
-		//something.studentEditClass(0, 0, "AUD", "Fall2015");
-	  // something.studentDropClass(0,2);
-		}
-	
 	public Student() { 
 		department = "";
 		type = "";
