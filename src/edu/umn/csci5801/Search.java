@@ -10,11 +10,13 @@ import java.util.List;
 import javax.xml.bind.TypeConstraintException;
 
 public class Search {
+	
+	
 	/* this will be removed it is just used for testing my code */
-	public static void main(String args[]) throws ClassNotFoundException, SQLException {
+	public static void main(String args[]) throws SQLException, ClassNotFoundException {
 		System.out.println("running");
 		Search something = new Search();
-		something.searchClasses(-1, "", "", "", "CS", "", "");
+		something.searchClasses(-1, "", "", "", "CS", "", "Daniel Mack");
 	}
 
 	public List<ArrayList<String>> searchClasses(int courseID, String courseName, String location, String term,
@@ -52,8 +54,13 @@ public class Search {
 			values.add("'" + classType + "'");
 		}
 		if (instructor != null && instructor != "") {
+			
+			String nameString[] = instructor.split("\\s+");
+			types.add("INSTRUCTOR.FIRSTNAME");
+			values.add("'"+ nameString[0] + "'");
+				
 			types.add("INSTRUCTOR.LASTNAME");
-			values.add("'" + instructor + "'");
+			values.add("'" + nameString[1] + "'");
 		}
 
 		StringBuilder sb = new StringBuilder();
@@ -69,24 +76,9 @@ public class Search {
 		// sb.append(";");
 		sqlCmd = sb.toString();
 		System.out.println(sqlCmd);
-		// String sqlCmd2 = "Select * from course";
-		// stmt.executeUpdate("INSERT INTO COURSE
-		// (ID,NAME,LOCATION,TERM,DEPARTMENT,TYPE,CREDITS,CAPACITY,FIRSTDAY,LASTDAY,CLASSBEGINTIME,CLASSENDTIME,ROUTINES,DESCRIPTION)
-		// VALUES ( 600, 'test2','East Bank KHKH3-3012','term2','CS','Seminar',
-		// 3, 10, 10/10/2016, 11/11/2016,'11:22','11:23','Tu Fri', 'do stuff3');
-		// " );
 
-		DBCoordinator db = new DBCoordinator();
-		List<ArrayList<Object>> res = new ArrayList<ArrayList<Object>>();
-		res = db.queryData(sqlCmd);
-		System.out.println(res);
-
-		resultList = DBProcessor.toStringArray(res);
-
-		// System.out.println(resultList);
-
+		resultList = DBProcessor.runQuery(sqlCmd);
+        System.out.println(resultList);
 		return resultList;
-
 	}
-
 }
