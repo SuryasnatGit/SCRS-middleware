@@ -30,7 +30,7 @@ public class SCRSImpl implements SCRS{
 	@Override
 	public List<ArrayList<String>> queryClass(int courseID, String courseName, String location, String term,
 			String department, String classType, String instructorName) {
-		Search search = new Search();
+		search = new Search();
 		try {
 			return search.searchClasses(courseID, courseName, location, term, department, classType, instructorName);
 		} catch (ClassNotFoundException | SQLException e) {
@@ -170,15 +170,5 @@ public class SCRSImpl implements SCRS{
 		}
 		return false;
 	}
-	
-	
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
-	}
-
 
 }
