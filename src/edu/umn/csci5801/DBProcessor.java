@@ -1,5 +1,6 @@
 package edu.umn.csci5801;
 import java.util.List;
+import java.text.SimpleDateFormat;
 
 import java.sql.Date;
 import java.sql.SQLException;
@@ -36,7 +37,10 @@ public final class DBProcessor {
         		else if(fields instanceof Integer)
         			strList.add( (String) fields.toString());
         		else if(fields instanceof Long)
-        			strList.add( new Date((long) fields).toString());
+        		{
+        			Date date = new Date((long) fields);
+        			strList.add( new SimpleDateFormat("MM/dd/yyyy").format(date));
+        		}
           		else 
         		{
         			throw new ClassCastException("Could not cast: " + fields );
@@ -69,7 +73,9 @@ public final class DBProcessor {
 		List<ArrayList<Object>> result = db.queryData(sqlCmd);
 		if(result.size() != 1)
 			throw new SQLException("Query returned more than 1 Date.");
-		return new Date((long) result.get(0).get(0)).toString();
+		Date date = new Date((long) result.get(0).get(0));
+		return  new SimpleDateFormat("MM/dd/yyyy").format(date);
+		
 	}
 	
 	public static ArrayList<ArrayList<String>> runQuery(String sqlCmd) throws SQLException, ClassNotFoundException {
