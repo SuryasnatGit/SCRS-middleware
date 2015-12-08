@@ -30,9 +30,9 @@ public class Student extends People {
 		Student something = new Student();
 	//	something.queryRegistrationHistory(0);
 	//	something.queryStudentPersonalData(0);
-	//	something.studentAddClass(0, 2, "A-F","Fall2015");
-	//	something.studentEditClass(0, 0, "AUD", "Fall2015");
-	    something.studentDropClass(0,2);
+	//something.studentAddClass(0, 2, "S/N","Fall2015");
+		//something.studentEditClass(0, 0, "AUD", "Fall2015");
+	  // something.studentDropClass(0,2);
 		}
 	
 	public Student() { 
@@ -125,13 +125,18 @@ public class Student extends People {
 						sqlCmd = "Insert into StudentAndCourse ( studentId, courseId, grading, courseterm ) values (?,?,?,?); ";					
 						db.insertData(sqlCmd, coursePropertyValue, coursePropertyType);
 						
+						coursePropertyType.clear();
+						coursePropertyValue.clear();
 						coursePropertyType.add(Constants.PrimitiveDataType.STRING);
 						coursePropertyValue.add(Integer.toString(incrementCredits));
 						coursePropertyType.add(Constants.PrimitiveDataType.INT);
 						coursePropertyValue.add(Integer.toString(studentId));
 						coursePropertyType.add(Constants.PrimitiveDataType.INT);
-					    String sqlCmd = "update student set credits = (?) Where and studentId = (?);";				
+					    String sqlCmd = "update student set credits = (?) Where id = (?);";				
 						db.updateData(sqlCmd, coursePropertyValue, coursePropertyType);
+						
+					    sqlTotalCredits = "select student.credits from student where student.Id = " + studentId;
+						totalCredit = DBProcessor.getIntegerFromQuery(sqlTotalCredits);
 				        isValid = true;
 				}
 		}
@@ -204,10 +209,6 @@ public class Student extends People {
 		
 		int yearInt = Calendar.getInstance().get(Calendar.YEAR);
 		
-		String sqlStudCredits = "select count (course.credits)from studentandcourse join course " +
-				"where studentandcourse.courseid = course.id and studentandcourse.studentid = " + studentId;
-		int studCredits = DBProcessor.getIntegerFromQuery(sqlStudCredits);
-		
 		String sqlCourseCredit = "select course.credits from course where course.Id = " + courseId;
 		int courseCredit = DBProcessor.getIntegerFromQuery(sqlCourseCredit);
 		
@@ -232,7 +233,7 @@ public class Student extends People {
 			date = format.parse(dateString);
 			dateStart = format.parse(beginRegisterDate); 
 			dateEnd = format.parse(endRegisterDate);
-				if (date.after(dateStart) && date.before(dateEnd)){
+			if (date.after(dateStart) && date.before(dateEnd)){
 					ArrayList<String>coursePropertyValue = new ArrayList<String>();
 					ArrayList<Constants.PrimitiveDataType>coursePropertyType = new ArrayList<Constants.PrimitiveDataType>();
 					sqlCmd = "delete from StudentAndCourse Where courseId= (?) and studentId = (?);";
@@ -242,15 +243,14 @@ public class Student extends People {
 					coursePropertyType.add(Constants.PrimitiveDataType.INT);
 					DBCoordinator db = new DBCoordinator();
 					db.deleteData(sqlCmd, coursePropertyValue, coursePropertyType);
-					
-					coursePropertyValue=null;
-					coursePropertyType= null;
+					coursePropertyValue.clear();
+					coursePropertyType.clear();
 					coursePropertyType.add(Constants.PrimitiveDataType.STRING);
 					coursePropertyValue.add(Integer.toString(decrementCredits));
 					coursePropertyType.add(Constants.PrimitiveDataType.INT);
 					coursePropertyValue.add(Integer.toString(studentId));
 					coursePropertyType.add(Constants.PrimitiveDataType.INT);
-				    String sqlCmd = "update student set credits = (?) Where and studentId = (?);";				
+				    String sqlCmd = "update student set credits = (?) Where Id = (?);";				
 					db.updateData(sqlCmd, coursePropertyValue, coursePropertyType);
 					isValid = true;	
 				}
@@ -258,11 +258,6 @@ public class Student extends People {
 		return isValid;
 	}
 	
-
-	
-	
-
-
 	public String getDepartmentInfo() {
 		return department;
 	}
