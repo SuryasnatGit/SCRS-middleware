@@ -1,17 +1,10 @@
 package edu.umn.csci5801;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.sql.SQLException;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 
 
 public class Student extends People {
@@ -37,32 +30,22 @@ public class Student extends People {
 		sqlCmd = "Select studentandcourse.id, course.name, studentandcourse.courseterm ,studentandcourse.grading " + 
 		"from course join StudentAndCourse where course.id = studentandcourse.courseid " +
 		"and studentID = " + studentId + ";";
-		System.out.println(sqlCmd);
 		resultList = DBProcessor.runQuery(sqlCmd);
-		 System.out.println(resultList);	
 		return resultList;
 	}
 	
 	public List<ArrayList<String>> queryStudentPersonalData (int studentId) throws ClassNotFoundException, SQLException{
-		//*****what about age***** currently returns just a dob
 		sqlCmd = "Select * from student where Id = " + studentId + ";";
-		resultList=DBProcessor.runQuery(sqlCmd);
+		resultList=DBProcessor.runQueryWithAge(sqlCmd);
 		return resultList;	
 	}
 	
 	public boolean studentAddClass (int studentId, int courseId, String grading, String courseTerm)throws ParseException, ClassNotFoundException, SQLException{
 		boolean isValid = false;
 		Date date = new Date();
-		Date dateEnd = new Date();
-		Date dateStart = new Date();
-		String beginRegisterDate = null;
-		String endRegisterDate = null;
-		String temp = null;
-		
+
 		String sqlGetTerm = "select course.term from course where course.id = " + courseId;
 		String term = DBProcessor.getStringFromQuery(sqlGetTerm);
-		
-		int yearInt = Calendar.getInstance().get(Calendar.YEAR);
 		
 		String sqlStudCredits = "select count (course.credits)from studentandcourse join course " +
 				"where studentandcourse.courseid = course.id and studentandcourse.studentid = " + studentId;
@@ -78,24 +61,7 @@ public class Student extends People {
 		int totalCredit = DBProcessor.getIntegerFromQuery(sqlTotalCredits);
 		int incrementCredits = totalCredit + courseCredit;
 		
-		if (term.toLowerCase().startsWith("fall")){
-		    temp = term.substring(4,8);
-		    beginRegisterDate = "07/01/" + temp;
-		    endRegisterDate = "09/01/" + temp;
-		}
-			else if(term.toLowerCase().startsWith("spring")) {
-				temp = term.substring(6,12);
-				beginRegisterDate = "12/01/" + temp;
-				endRegisterDate = "02/01/" + temp;
-			}
-
-		if (temp!=null && Integer.toString(yearInt).equals(temp)){
-			SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
-			String dateString = new SimpleDateFormat("MM/dd/yyyy").format(date);
-			date = format.parse(dateString);
-			dateStart = format.parse(beginRegisterDate); 
-			dateEnd = format.parse(endRegisterDate);
-			if (date.after(dateStart) && date.before(dateEnd))
+		if (DBProcessor.isDateWithinRange(term, date)){
 				if ((courseCredit + studCredits)<=30)
 					if (capacity != 30){
 						ArrayList<String>coursePropertyValue = new ArrayList<String>();
@@ -126,7 +92,7 @@ public class Student extends People {
 						
 					    sqlTotalCredits = "select student.credits from student where student.Id = " + studentId;
 						totalCredit = DBProcessor.getIntegerFromQuery(sqlTotalCredits);
-				        isValid = true;
+						isValid = true;
 				}
 		}
 		return isValid;
@@ -136,35 +102,11 @@ public class Student extends People {
 	public boolean studentEditClass(int studentId, int courseId, String grading, String courseTerm) throws ParseException, SQLException, ClassNotFoundException{
 		boolean isValid = false;
 		Date date = new Date();
-		Date dateEnd = new Date();
-		Date dateStart = new Date();
-		String beginRegisterDate = null;
-		String endRegisterDate = null;
-		String temp = null;
-		
+	
 		String sqlGetTerm = "select course.term from course where course.id = " + courseId;
 		String term = DBProcessor.getStringFromQuery(sqlGetTerm);
-		
-		int yearInt = Calendar.getInstance().get(Calendar.YEAR);
 			
-		if (term.toLowerCase().startsWith("fall")){
-		    temp = term.substring(4,8);
-		    beginRegisterDate = "07/01/" + temp;
-		    endRegisterDate = "09/01/" + temp;
-		}
-			else if(term.toLowerCase().startsWith("spring")) {
-				temp = term.substring(6,12);
-				beginRegisterDate = "12/01/" + temp;
-				endRegisterDate = "02/01/" + temp;
-			}
-
-		if (temp!=null && Integer.toString(yearInt).equals(temp)){
-			SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
-			String dateString = new SimpleDateFormat("MM/dd/yyyy").format(date);
-			date = format.parse(dateString);
-			dateStart = format.parse(beginRegisterDate); 
-			dateEnd = format.parse(endRegisterDate);
-				if (date.after(dateStart) && date.before(dateEnd)){
+		if (DBProcessor.isDateWithinRange(term, date)){
 					ArrayList<String>coursePropertyValue = new ArrayList<String>();
 					ArrayList<Constants.PrimitiveDataType>coursePropertyType = new ArrayList<Constants.PrimitiveDataType>();
 					coursePropertyValue.add((grading));
@@ -177,7 +119,6 @@ public class Student extends People {
 					DBCoordinator db = new DBCoordinator();
 					db.updateData(sqlCmd, coursePropertyValue, coursePropertyType);
 					isValid = true;	
-			}
 		}
 		return isValid;
 	}
@@ -186,18 +127,11 @@ public class Student extends People {
 	
 	public boolean studentDropClass (int studentId, int courseId)throws ParseException, SQLException, ClassNotFoundException{
 		boolean isValid = false;
-		Date date = new Date();
-		Date dateEnd = new Date();
-		Date dateStart = new Date();
-		String beginRegisterDate = null;
-		String endRegisterDate = null;
-		String temp = null;
+		Date date = new Date(); //get current date
 		
 		String sqlGetTerm = "select course.term from course where course.id = " + courseId;
 		String term = DBProcessor.getStringFromQuery(sqlGetTerm);
-		
-		int yearInt = Calendar.getInstance().get(Calendar.YEAR);
-		
+				
 		String sqlCourseCredit = "select course.credits from course where course.Id = " + courseId;
 		int courseCredit = DBProcessor.getIntegerFromQuery(sqlCourseCredit);
 		
@@ -205,24 +139,7 @@ public class Student extends People {
 		int totalCredit = DBProcessor.getIntegerFromQuery(sqlTotalCredits);
 		int decrementCredits = totalCredit - courseCredit;
 		
-		if (term.toLowerCase().startsWith("fall")){
-		    temp = term.substring(4,8);
-		    beginRegisterDate = "07/01/" + temp;
-		    endRegisterDate = "09/01/" + temp;
-		}
-			else if(term.toLowerCase().startsWith("spring")) {
-				temp = term.substring(6,12);
-				beginRegisterDate = "12/01/" + temp;
-				endRegisterDate = "02/01/" + temp;
-			}
-		
-		if (temp!=null && Integer.toString(yearInt).equals(temp)){
-			SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
-			String dateString = new SimpleDateFormat("MM/dd/yyyy").format(date);
-			date = format.parse(dateString);
-			dateStart = format.parse(beginRegisterDate); 
-			dateEnd = format.parse(endRegisterDate);
-			if (date.after(dateStart) && date.before(dateEnd)){
+		if (DBProcessor.isDateWithinRange(term, date)){
 					ArrayList<String>coursePropertyValue = new ArrayList<String>();
 					ArrayList<Constants.PrimitiveDataType>coursePropertyType = new ArrayList<Constants.PrimitiveDataType>();
 					sqlCmd = "delete from StudentAndCourse Where courseId= (?) and studentId = (?);";
@@ -242,8 +159,7 @@ public class Student extends People {
 				    String sqlCmd = "update student set credits = (?) Where Id = (?);";				
 					db.updateData(sqlCmd, coursePropertyValue, coursePropertyType);
 					isValid = true;	
-				}
-				}
+		}
 		return isValid;
 	}
 	

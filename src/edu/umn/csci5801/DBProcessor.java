@@ -44,6 +44,7 @@ public final class DBProcessor {
         		else if(fields instanceof Long)
         		{
         			Date date = new Date((long) fields);
+        			System.out.println("DATE : " + date.toString());
         			strList.add( new SimpleDateFormat("MM/dd/yyyy").format(date));
         		}
           		else 
@@ -165,15 +166,15 @@ public final class DBProcessor {
 		
 		if (term.toLowerCase().trim().startsWith("fall")){
 			beginRegistrationDate = "07/01/";
-			endRegistrationDate = "09/01";
+			endRegistrationDate = "09/01/";
 		}
 		else if(term.toLowerCase().trim().startsWith("spring")){
-			beginRegistrationDate = "12/01";
-			endRegistrationDate = "02/01";
+			beginRegistrationDate = "12/01/";
+			endRegistrationDate = "02/01/";
 		}
 		else
 		{
-			throw new ParseException("Invalid term", 4);
+			throw new ParseException("Invalid term: " + term, 4);
 		}
 		
 		beginRegistrationDate += termYear;
