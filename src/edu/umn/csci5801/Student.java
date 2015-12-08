@@ -30,7 +30,9 @@ public class Student extends People {
 		Student something = new Student();
 	//	something.queryRegistrationHistory(0);
 	//	something.queryStudentPersonalData(0);
-		something.studentAddClass(0, 2, "A-F","Fall2015");
+	//	something.studentAddClass(0, 2, "A-F","Fall2015");
+	//	something.studentEditClass(0, 0, "AUD", "Fall2015");
+	    something.studentDropClass(0,2);
 		}
 	
 	public Student() { 
@@ -83,6 +85,10 @@ public class Student extends People {
 		String sqlCapacity = "select course.capacity from course where course.Id = " + courseId;
 		int capacity = DBProcessor.getIntegerFromQuery(sqlCapacity);
 		
+		String sqlTotalCredits = "select student.credits from student where student.Id = " + studentId;
+		int totalCredit = DBProcessor.getIntegerFromQuery(sqlTotalCredits);
+		int incrementCredits = totalCredit + courseCredit;
+		
 		if (term.toLowerCase().startsWith("fall")){
 		    temp = term.substring(4,8);
 		    beginRegisterDate = "07/01/" + temp;
@@ -94,20 +100,16 @@ public class Student extends People {
 				endRegisterDate = "02/01/" + temp;
 			}
 
-		if (temp!=null && !Integer.toString(yearInt).equals(temp))
-			isValid = false;
-
-		SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
-		String dateString = new SimpleDateFormat("MM/dd/yyyy").format(date);
-		date = format.parse(dateString);
-		dateStart = format.parse(beginRegisterDate); 
-		dateEnd = format.parse(endRegisterDate);
-		
-		if (temp!=null && Integer.toString(yearInt).equals(temp))
+		if (temp!=null && Integer.toString(yearInt).equals(temp)){
+			SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
+			String dateString = new SimpleDateFormat("MM/dd/yyyy").format(date);
+			date = format.parse(dateString);
+			dateStart = format.parse(beginRegisterDate); 
+			dateEnd = format.parse(endRegisterDate);
 			if (date.after(dateStart) && date.before(dateEnd))
 				if ((courseCredit + studCredits)<=30)
 					if (capacity != 30){
-					ArrayList<String>coursePropertyValue = new ArrayList<String>();
+						ArrayList<String>coursePropertyValue = new ArrayList<String>();
 						ArrayList<Constants.PrimitiveDataType>coursePropertyType = new ArrayList<Constants.PrimitiveDataType>();
 						coursePropertyValue.add(Integer.toString(studentId));
 						coursePropertyType.add(Constants.PrimitiveDataType.INT);
@@ -122,32 +124,144 @@ public class Student extends People {
 						DBCoordinator db = new DBCoordinator();
 						sqlCmd = "Insert into StudentAndCourse ( studentId, courseId, grading, courseterm ) values (?,?,?,?); ";					
 						db.insertData(sqlCmd, coursePropertyValue, coursePropertyType);
-
+						
+						coursePropertyType.add(Constants.PrimitiveDataType.STRING);
+						coursePropertyValue.add(Integer.toString(incrementCredits));
+						coursePropertyType.add(Constants.PrimitiveDataType.INT);
+						coursePropertyValue.add(Integer.toString(studentId));
+						coursePropertyType.add(Constants.PrimitiveDataType.INT);
+					    String sqlCmd = "update student set credits = (?) Where and studentId = (?);";				
+						db.updateData(sqlCmd, coursePropertyValue, coursePropertyType);
 				        isValid = true;
 				}
+		}
 		return isValid;
 	}
 
-	
-	public boolean studentEditClass(int courseId, String grading, String courseTerm){
+	//Make sure we passing student id from SCRS
+	public boolean studentEditClass(int studentId, int courseId, String grading, String courseTerm) throws ParseException, SQLException, ClassNotFoundException{
+		boolean isValid = false;
+		Date date = new Date();
+		Date dateEnd = new Date();
+		Date dateStart = new Date();
+		String beginRegisterDate = null;
+		String endRegisterDate = null;
+		String temp = null;
 		
+		String sqlGetTerm = "select course.term from course where course.id = " + courseId;
+		String term = DBProcessor.getStringFromQuery(sqlGetTerm);
 		
-		
-		
-		return true;
-		
+		int yearInt = Calendar.getInstance().get(Calendar.YEAR);
+			
+		if (term.toLowerCase().startsWith("fall")){
+		    temp = term.substring(4,8);
+		    beginRegisterDate = "07/01/" + temp;
+		    endRegisterDate = "09/01/" + temp;
+		}
+			else if(term.toLowerCase().startsWith("spring")) {
+				temp = term.substring(6,12);
+				beginRegisterDate = "12/01/" + temp;
+				endRegisterDate = "02/01/" + temp;
+			}
+
+		if (temp!=null && Integer.toString(yearInt).equals(temp)){
+			SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
+			String dateString = new SimpleDateFormat("MM/dd/yyyy").format(date);
+			date = format.parse(dateString);
+			dateStart = format.parse(beginRegisterDate); 
+			dateEnd = format.parse(endRegisterDate);
+				if (date.after(dateStart) && date.before(dateEnd)){
+					ArrayList<String>coursePropertyValue = new ArrayList<String>();
+					ArrayList<Constants.PrimitiveDataType>coursePropertyType = new ArrayList<Constants.PrimitiveDataType>();
+					coursePropertyValue.add((grading));
+					coursePropertyType.add(Constants.PrimitiveDataType.STRING);
+					coursePropertyValue.add(Integer.toString(courseId));
+					coursePropertyType.add(Constants.PrimitiveDataType.INT);
+					coursePropertyValue.add(Integer.toString(studentId));
+					coursePropertyType.add(Constants.PrimitiveDataType.INT);
+				    String sqlCmd = "update StudentAndCourse set grading = (?) Where courseId= (?) and studentId = (?);";				
+					DBCoordinator db = new DBCoordinator();
+					db.updateData(sqlCmd, coursePropertyValue, coursePropertyType);
+					isValid = true;	
+			}
+		}
+		return isValid;
 	}
 	
 	
 	
-	public boolean studentDropClass (int studentId, int courseId){
-		//verify student in class
-		//increment capacity in courses
-		//remove from student and course
-		// decrement credits from student
-		return true;
+	public boolean studentDropClass (int studentId, int courseId)throws ParseException, SQLException, ClassNotFoundException{
+		boolean isValid = false;
+		Date date = new Date();
+		Date dateEnd = new Date();
+		Date dateStart = new Date();
+		String beginRegisterDate = null;
+		String endRegisterDate = null;
+		String temp = null;
+		
+		String sqlGetTerm = "select course.term from course where course.id = " + courseId;
+		String term = DBProcessor.getStringFromQuery(sqlGetTerm);
+		
+		int yearInt = Calendar.getInstance().get(Calendar.YEAR);
+		
+		String sqlStudCredits = "select count (course.credits)from studentandcourse join course " +
+				"where studentandcourse.courseid = course.id and studentandcourse.studentid = " + studentId;
+		int studCredits = DBProcessor.getIntegerFromQuery(sqlStudCredits);
+		
+		String sqlCourseCredit = "select course.credits from course where course.Id = " + courseId;
+		int courseCredit = DBProcessor.getIntegerFromQuery(sqlCourseCredit);
+		
+		String sqlTotalCredits = "select student.credits from student where student.Id = " + studentId;
+		int totalCredit = DBProcessor.getIntegerFromQuery(sqlTotalCredits);
+		int decrementCredits = totalCredit - courseCredit;
+		
+		if (term.toLowerCase().startsWith("fall")){
+		    temp = term.substring(4,8);
+		    beginRegisterDate = "07/01/" + temp;
+		    endRegisterDate = "09/01/" + temp;
+		}
+			else if(term.toLowerCase().startsWith("spring")) {
+				temp = term.substring(6,12);
+				beginRegisterDate = "12/01/" + temp;
+				endRegisterDate = "02/01/" + temp;
+			}
+		
+		if (temp!=null && Integer.toString(yearInt).equals(temp)){
+			SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
+			String dateString = new SimpleDateFormat("MM/dd/yyyy").format(date);
+			date = format.parse(dateString);
+			dateStart = format.parse(beginRegisterDate); 
+			dateEnd = format.parse(endRegisterDate);
+				if (date.after(dateStart) && date.before(dateEnd)){
+					ArrayList<String>coursePropertyValue = new ArrayList<String>();
+					ArrayList<Constants.PrimitiveDataType>coursePropertyType = new ArrayList<Constants.PrimitiveDataType>();
+					sqlCmd = "delete from StudentAndCourse Where courseId= (?) and studentId = (?);";
+					coursePropertyValue.add(Integer.toString(courseId));
+					coursePropertyType.add(Constants.PrimitiveDataType.INT);
+					coursePropertyValue.add(Integer.toString(studentId));
+					coursePropertyType.add(Constants.PrimitiveDataType.INT);
+					DBCoordinator db = new DBCoordinator();
+					db.deleteData(sqlCmd, coursePropertyValue, coursePropertyType);
+					
+					coursePropertyValue=null;
+					coursePropertyType= null;
+					coursePropertyType.add(Constants.PrimitiveDataType.STRING);
+					coursePropertyValue.add(Integer.toString(decrementCredits));
+					coursePropertyType.add(Constants.PrimitiveDataType.INT);
+					coursePropertyValue.add(Integer.toString(studentId));
+					coursePropertyType.add(Constants.PrimitiveDataType.INT);
+				    String sqlCmd = "update student set credits = (?) Where and studentId = (?);";				
+					db.updateData(sqlCmd, coursePropertyValue, coursePropertyType);
+					isValid = true;	
+				}
+				}
+		return isValid;
 	}
-	// studentAddClass(Token token, int courseID, string grading, String courseterm): return Boolean 
+	
+
+	
+	
+
 
 	public String getDepartmentInfo() {
 		return department;
@@ -196,8 +310,4 @@ public class Student extends People {
 	public void updateAdvisor(String newAdvisor) {
 		advisor = newAdvisor;
 	}
-	
-	
-	
-	
 }
