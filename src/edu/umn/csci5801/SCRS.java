@@ -100,7 +100,9 @@ public interface SCRS {
 	 * @param courseID
 	 * @param courseName
 	 * @param courseCredits
-	 * @param instructor
+	 * @param courseCapacity
+	 * @param term
+	 * @param instructorID
 	 * @param firstDay The first day of the class in the new semester
 	 * @param lastDay The last day of the class in the new semester
 	 * @param classBeginTime E.g. 9:00
@@ -113,7 +115,7 @@ public interface SCRS {
 	 * @param department
 	 * @return Return true if the operation is successfully, false otherwise
 	 */
-	boolean adminAddClass(ShibbolethAuth.Token token, int courseID, String courseName, int courseCredits, String instructor, String firstDay,
+	boolean adminAddClass(ShibbolethAuth.Token token, int courseID, String courseName, int courseCredits, int courseCapacity, String term, int instructorID, String firstDay,
 			String lastDay, String classBeginTime, String classEndTime, String weekDays, String location, String type,
 			String prerequisite, String description, String department); 
 
@@ -146,7 +148,7 @@ public interface SCRS {
 	 * @param department
 	 * @return Return true if the operation is successfully, false otherwise
 	 */
-	boolean adminEditClass(ShibbolethAuth.Token token, int courseID, String courseName, int courseCredits, String instructor, String firstDay,
+	boolean adminEditClass(ShibbolethAuth.Token token, int courseID, String courseName, int courseCredits, int instructorID, String firstDay,
 			String lastDay, String classBeginTime, String classEndTime, String weekDays, String location, String type,
 			String prerequisite, String description, String department); 
 

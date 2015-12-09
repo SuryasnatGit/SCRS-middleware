@@ -19,7 +19,6 @@ public class DBCoordinator {
 	/**
 	 *  Connection object used to perform queries on the database. 
 	 */
-	
 	private Connection con;
 	/**
 	 *  Statement object that will be executed upon getting a connection to the database. 
@@ -47,7 +46,7 @@ public class DBCoordinator {
 		Class.forName("org.sqlite.JDBC");
 		con = DriverManager.getConnection("jdbc:sqlite:SCRSDataBase.db");
 		con.setAutoCommit(false);
-		System.out.println("Opened database successfully");
+		//System.out.println("Opened database successfully");
 
 		sqlCmd = originStr;
 		stmt = con.createStatement();
@@ -65,7 +64,7 @@ public class DBCoordinator {
 		con.commit();
 		con.close();
 
-		System.out.println("Operation done successfully");
+		//System.out.println("Operation done successfully");
 
 		return res;
 	}
