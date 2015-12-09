@@ -252,7 +252,7 @@ public class Administrator extends People{
 	 * @param department
 	 * @return Return true if the operation is successfully, false otherwise
 	 */
-	public boolean adminEditClass(ShibbolethAuth.Token token, int courseID, String courseName, int courseCredits, String instructor, String firstDay,
+	public boolean adminEditClass(ShibbolethAuth.Token token, int courseID, String courseName, int courseCredits, int instructorId, String firstDay,
 		String lastDay, String classBeginTime, String classEndTime, String weekDays, String location, String type,
 		String prerequisite, String description, String department)throws SQLException,ClassNotFoundException,ParseException{
 		
@@ -282,15 +282,11 @@ public class Administrator extends People{
 				coursePropertyType.add(Constants.PrimitiveDataType.INT);
 				sqlCmdEdit =sqlCmdEdit.concat("credits = (?) and ");
     		}
-    		if (instructor != null && instructor != "") {
-    			
-    			String nameString[] = instructor.split("\\s+");
-				coursePropertyValue.add(nameString[0]);
-				coursePropertyType.add(Constants.PrimitiveDataType.STRING);
-				sqlCmdEdit =sqlCmdEdit.concat("firstname = (?) and ");
-				coursePropertyValue.add(nameString[1]);
-				coursePropertyType.add(Constants.PrimitiveDataType.STRING);
-				sqlCmdEdit =sqlCmdEdit.concat("lastname = (?) and ");
+    		if (instructorId >= 0) {
+				coursePropertyValue.add(Integer.toString(instructorId));
+				coursePropertyType.add(Constants.PrimitiveDataType.INT);
+				sqlCmdEdit =sqlCmdEdit.concat("instructorId = (?) and ");
+
     		}
     		if (firstDay != null && firstDay != "") {
     			coursePropertyValue.add(firstDay);
@@ -368,9 +364,6 @@ public class Administrator extends People{
 		return isValid;
 	}
 		
-		
-		
-
 	/**
 	 * This method will allow the admin to add one student to one specific class if exist
 	 * @param token
@@ -388,7 +381,6 @@ public class Administrator extends People{
 		boolean isValid = false;
 		String sqlCmd;
 
-		
 		String sqlStudCredits = "select count (course.credits)from studentandcourse join course " +
 				"where studentandcourse.courseid = course.id and studentandcourse.studentid = " + studentID;
 		int studCredits = DBProcessor.getIntegerFromQuery(sqlStudCredits);
