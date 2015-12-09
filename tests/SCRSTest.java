@@ -273,7 +273,7 @@ public class SCRSTest {
 		System.out.println("9-ok");
 		//NULL:don't have instructor name
 		//firstday and lastday is calculated by the queryPersonalData
-		resultActual=scrs.adminAddClass(adminToken, 2, "Parallel Computing ", 3, "NULL ", "9/2/2015 ","12/21/2015 ",
+		resultActual=scrs.adminAddClass(adminToken, 2, "Parallel Computing ", 3, 30, "Fall2015", 0 ,"9/2/2015 ","12/21/2015 ",
 				"09:00 Am ","11:00 Am ","Tu, Fri ","East Campus ","Lecture ","NULL ","Good Good Good Class ","CS");
 
 		if (resultExpected && resultActual)
@@ -315,7 +315,7 @@ public class SCRSTest {
 		System.out.println("11-ok");
 		
 		//Since modify, i am giving info randomly.
-		resultActual=scrs.adminEditClass(adminToken, 1, "Advanced Algorithm ", 5, "Yijia Zhang ", "9/1/2014 ","12/12/2014 ",
+		resultActual=scrs.adminEditClass(adminToken, 1, "Advanced Algorithm ", 5, 2, "9/1/2014 ","12/12/2014 ",
 				"8:45 AM ", "9:30 AM ","Tu, Fri ", "East Bank ", "Lecture ", "Algorithm and Data Structure ",
 				"Good Good Good Class ", "CS "); 
 

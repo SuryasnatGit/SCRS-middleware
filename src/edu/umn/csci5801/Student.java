@@ -80,13 +80,16 @@ public class Student extends People {
 		String sqlCapacity = "select course.capacity from course where course.Id = " + courseId;
 		int capacity = DBProcessor.getIntegerFromQuery(sqlCapacity);
 		
+		String sqlNumberOfStudents = "select count(*) from studentandcourse where course.Id = " + courseId;
+		int numEnrolled = DBProcessor.getIntegerFromQuery(sqlNumberOfStudents);
+		
 		String sqlTotalCredits = "select student.credits from student where student.Id = " + studentId;
 		int totalCredit = DBProcessor.getIntegerFromQuery(sqlTotalCredits);
 		int incrementCredits = totalCredit + courseCredit;
 		
 		if (DBProcessor.isDateWithinRange(term, date)){
 				if ((courseCredit + studCredits)<=30)
-					if (capacity != 30){
+					if (capacity != numEnrolled){
 						ArrayList<String>coursePropertyValue = new ArrayList<String>();
 						ArrayList<Constants.PrimitiveDataType>coursePropertyType = new ArrayList<Constants.PrimitiveDataType>();
 						coursePropertyValue.add(Integer.toString(studentId));
