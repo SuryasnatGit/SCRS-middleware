@@ -15,8 +15,7 @@ public class SCRSTest {
 
 	@Before
 	public void setUp() throws Exception {
-		scrs = null;
-				//new SCRSImpl();
+		scrs = new SCRSImpl();
 		shibboleth=new ShibbolethAuth();
 	}
 
@@ -33,7 +32,7 @@ public class SCRSTest {
 		aClass.add("2");
 		
 		resultExpected.add(aClass);
-		//NULL: Instructotr name
+		//NULL: Instructor name
 		System.out.println("1-ok");
 		resultActual=scrs.queryClass(1, "Advanced Algorithm ","East Campus ","Fall2014 ","CS ","Lecture ","NULL"); 
 		
@@ -298,7 +297,7 @@ public class SCRSTest {
 		
 		resultActual=scrs.adminDeleteClass(adminToken, 0);
 
-		if (resultExpected && resultActual)
+		if (!(resultExpected && resultActual))
 		{
 			System.out.println("testStudentEditClass passed! Nice!");
 		}
@@ -306,8 +305,6 @@ public class SCRSTest {
 		{
 			fail("Actual result is not the expected result!!!");
 		}
-		
-		//fail("Not yet implemented");
 	}
 
 	@Test
@@ -343,7 +340,7 @@ public class SCRSTest {
 		//Since modify, i am giving info randomly.
 		resultActual=scrs.adminAddStudentToClass(adminToken, 1, 2, "A-F", "Fall2015"); 
 		
-		if (resultExpected && resultActual)
+		if ((resultExpected && resultActual))
 		{
 			System.out.println("testStudentEditClass passed! Nice!");
 		}
@@ -351,7 +348,6 @@ public class SCRSTest {
 		{
 			fail("Actual result is not the expected result!!!");
 		}
-		//fail("Not yet implemented");
 	}
 
 	@Test

@@ -14,8 +14,9 @@ public class SimpleTestDriver {
 	
 	Administrator administrator = new Administrator();
 	
-	ShibbolethAuth.Token token = null;
-	
+	ShibbolethAuth auth = new ShibbolethAuth();
+	ShibbolethAuth.Token token = auth.tokenGenerator("Abc1005", "5000");
+
 //	System.out.println(something.queryRegistrationHistory(0));
 	
 //	System.out.println(something.queryStudentPersonalData(5));
@@ -41,6 +42,6 @@ public class SimpleTestDriver {
 		
 	//	System.out.println(administrator.adminDeleteClass(token, 34));
 		
-	//	System.out.println(administrator.queryAdminPersonalData(token));
+		System.out.println(administrator.queryAdminPersonalData(token));
 	}
 }
