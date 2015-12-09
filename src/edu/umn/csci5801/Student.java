@@ -175,8 +175,9 @@ public class Student extends People {
 	 * @throws ParseException
 	 * @throws SQLException
 	 * @throws ClassNotFoundException
+	 * @throws NotWithinTimeFrameException 
 	 */
-	public boolean studentDropClass (Token token, int courseId)throws ParseException, SQLException, ClassNotFoundException{
+	public boolean studentDropClass (Token token, int courseId)throws ParseException, SQLException, ClassNotFoundException, NotWithinTimeFrameException{
 		boolean isValid = false;
 		int studentId = token.id;
 		Date date = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").parse(token.timeStamp);
@@ -212,6 +213,8 @@ public class Student extends People {
 					db.updateData(sqlCmd, coursePropertyValue, coursePropertyType);
 					isValid = true;	
 		}
+		else 
+			throw new NotWithinTimeFrameException("Cannot edit class out of time frame.");
 		return isValid;
 	}
 	
