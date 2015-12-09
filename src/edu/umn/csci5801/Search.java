@@ -73,8 +73,12 @@ public class Search {
 			sb.append(values.get(i));
 		}
 		sqlCmd = sb.toString();
-
-		resultList = DBProcessor.runQuery(sqlCmd);
+        
+		String sqlAll = "Select * from course join instructorandcourse, instructor where course.id = instructorandcourse.courseid and instructor.id = instructorandcourse.id";
+		if(courseID == -1)
+			resultList = DBProcessor.runQuery(sqlAll);
+		else
+			resultList = DBProcessor.runQuery(sqlCmd);
 		return resultList;
 	}
 }
