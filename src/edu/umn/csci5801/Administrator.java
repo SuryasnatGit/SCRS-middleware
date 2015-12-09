@@ -25,14 +25,12 @@ public class Administrator extends People{
 		type = newType;
 	}
 	
-
 	public List<ArrayList<String>> queryAdminPersonalData(ShibbolethAuth.Token token) throws ClassNotFoundException, SQLException{
 		List<ArrayList<String>> resultList;
 		
 		int instructorId = token.id;
 		if (instructorId == -1){
 		String	sqlCmdAll = "Select * from instructor;";
-		
 		resultList = DBProcessor.runQueryWithAge(sqlCmdAll);
 		}
 		else {
@@ -71,12 +69,11 @@ public class Administrator extends People{
 	 * @throws ClassNotFoundException 
 	 */
 	boolean adminAddClass(ShibbolethAuth.Token token, int courseID, String courseName, int courseCredits, int courseCapacity, String term, int instructorID, String firstDay,
-			String lastDay, String classBeginTime, String classEndTime, String weekDays, String location, String type,
-			String prerequisite, String description, String department)  throws ClassNotFoundException, SQLException, ParseException{
+		String lastDay, String classBeginTime, String classEndTime, String weekDays, String location, String type,
+		String prerequisite, String description, String department)  throws ClassNotFoundException, SQLException, ParseException{
 		boolean isValid = true;
 		ArrayList<String>coursePropertyValue = new ArrayList<String>();
 		ArrayList<Constants.PrimitiveDataType>coursePropertyType = new ArrayList<Constants.PrimitiveDataType>();
-		
 		String sqlCmdEdit = " insert into course ";
 		
         if(courseID != -1) {
@@ -182,14 +179,12 @@ public class Administrator extends People{
         		coursePropertyType.add(Constants.PrimitiveDataType.STRING);
         		sqlCmdEdit =sqlCmdEdit.concat("prerequisite) Values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
         		
-     
         if(isValid){
         	DBCoordinator db = new DBCoordinator();
 			db.insertData(sqlCmdEdit, coursePropertyValue, coursePropertyType);
 			coursePropertyValue.clear();
 			coursePropertyType.clear();
 			String sqlCmdInsert = "insert into instructorandcourse (courseID, instructorID) Values (?,?);";
-	
 			coursePropertyValue.add(Integer.toString(courseID));
 			coursePropertyType.add(Constants.PrimitiveDataType.INT);
 			sqlCmdEdit = sqlCmdEdit.concat("courseid,");
@@ -220,8 +215,6 @@ public class Administrator extends People{
 		String sqlNumRegistered = "select count (studentid)from studentandcourse " +
 				"where studentandcourse.courseid ="  +courseID + "";
 		int numRegForClass = DBProcessor.getIntegerFromQuery(sqlNumRegistered);
-		
-		
 		if (numRegForClass == 0){
 			ArrayList<String>coursePropertyValue = new ArrayList<String>();
 			ArrayList<Constants.PrimitiveDataType>coursePropertyType = new ArrayList<Constants.PrimitiveDataType>();
@@ -231,10 +224,8 @@ public class Administrator extends People{
 			coursePropertyType.add(Constants.PrimitiveDataType.INT);
 			DBCoordinator db = new DBCoordinator();
 			db.deleteData(sqlCmd, coursePropertyValue, coursePropertyType);	
-			db.deleteData(sqlDelInstCour, coursePropertyValue, coursePropertyType);
-			
-		} else
-		{
+			db.deleteData(sqlDelInstCour, coursePropertyValue, coursePropertyType);	
+		} else {
 			isValid = false;
 		}
 		return isValid;
@@ -411,9 +402,12 @@ public class Administrator extends People{
 		String sqlTotalCredits = "select student.credits from student where student.Id = " + studentID;
 		int totalCredit = DBProcessor.getIntegerFromQuery(sqlTotalCredits);
 		int incrementCredits = totalCredit + courseCredit;
-
+		
+		String sqlNumberOfStudents = "select count(*) from studentandcourse where course.Id = " + courseID;
+		int numEnrolled = DBProcessor.getIntegerFromQuery(sqlNumberOfStudents);
+		
 				if ((courseCredit + studCredits)<=30)
-					if (capacity != 30){
+					if (capacity != numEnrolled){
 						ArrayList<String>coursePropertyValue = new ArrayList<String>();
 						ArrayList<Constants.PrimitiveDataType>coursePropertyType = new ArrayList<Constants.PrimitiveDataType>();
 						coursePropertyValue.add(Integer.toString(studentID));
@@ -536,7 +530,4 @@ public class Administrator extends People{
 		
 		return isValid;
 	}
-		
-		
-
 }
