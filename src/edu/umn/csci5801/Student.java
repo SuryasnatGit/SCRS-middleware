@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 
 import edu.umn.csci5801.ShibbolethAuth.Token;
+import edu.umn.csci5801.exceptions.NotWithinTimeFrameException;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -52,7 +53,7 @@ public class Student extends People {
 		return resultList;	
 	}
 	
-	/**
+	/**Delegate function that will perform the actual DB operations for class addition by the Student.
 	 * @param studentId
 	 * @param courseId
 	 * @param grading
@@ -61,8 +62,9 @@ public class Student extends People {
 	 * @throws ParseException
 	 * @throws ClassNotFoundException
 	 * @throws SQLException
+	 * @throws NotWithinTimeFrameException 
 	 */
-	public boolean studentAddClass (Token token, int courseId, String grading, String courseTerm)throws ParseException, ClassNotFoundException, SQLException{
+	public boolean studentAddClass (Token token, int courseId, String grading, String courseTerm)throws ParseException, ClassNotFoundException, SQLException, NotWithinTimeFrameException{
 		boolean isValid = false;
 		int studentId = token.id;
 		Date date = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").parse(token.timeStamp);
@@ -121,11 +123,12 @@ public class Student extends People {
 						isValid = true;
 				}
 		}
+		else 
+			throw new NotWithinTimeFrameException("Cannot add class outside the time frame.");
 		return isValid;
 	}
 
-	//Make sure we passing student id from SCRS
-	/**
+	/**Delegate that performs the student edit class DB operations.
 	 * @param studentId
 	 * @param courseId
 	 * @param grading
@@ -134,8 +137,9 @@ public class Student extends People {
 	 * @throws ParseException
 	 * @throws SQLException
 	 * @throws ClassNotFoundException
+	 * @throws NotWithinTimeFrameException 
 	 */
-	public boolean studentEditClass(Token token, int courseId, String grading, String courseTerm) throws ParseException, SQLException, ClassNotFoundException{
+	public boolean studentEditClass(Token token, int courseId, String grading, String courseTerm) throws ParseException, SQLException, ClassNotFoundException, NotWithinTimeFrameException{
 		boolean isValid = false;
 		int studentId = token.id;
 		Date date = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").parse(token.timeStamp);
@@ -157,12 +161,14 @@ public class Student extends People {
 					db.updateData(sqlCmd, coursePropertyValue, coursePropertyType);
 					isValid = true;	
 		}
+		else 
+			throw new NotWithinTimeFrameException("Cannot edit class out of time frame.");
 		return isValid;
 	}
 	
 	
 	
-	/**
+	/**Delegate function that will perform the actual validation and DB operation to drop the class.
 	 * @param studentId
 	 * @param courseId
 	 * @return
