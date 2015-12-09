@@ -4,6 +4,7 @@
 package edu.umn.csci5801;
 
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +12,7 @@ import javax.management.relation.Role;
 
 import edu.umn.csci5801.ShibbolethAuth.Token;
 import edu.umn.csci5801.ShibbolethAuth.Token.RoleType;
+import edu.umn.csci5801.exceptions.NotWithinTimeFrameException;
 
 /**
  * This Class implements all the functions defined in the SCRS interface. 
@@ -116,7 +118,11 @@ public class SCRSImpl implements SCRS{
 				if(token.id != studentID)
 					return _empty;
 			}
-			return student.queryRegistrationHistory(studentID);
+			try {
+				return student.queryRegistrationHistory(studentID);
+			} catch (ClassNotFoundException | SQLException e) {
+				System.err.println("Unable to query student registration data, please try again.");
+			}
 		}
 		//authentication failed or not a student
 		return _empty;
@@ -134,7 +140,11 @@ public class SCRSImpl implements SCRS{
 	public List<ArrayList<String>> queryAdminPersonalData(Token token) {
 		if(token.type != RoleType.UNDEFINED && token.type != RoleType.STUDENT)
 		{
-			return admin.queryAdminPersonalData(token);
+			try {
+				return admin.queryAdminPersonalData(token);
+			} catch (ClassNotFoundException | SQLException e) {
+				System.err.println("Unable to query administrator personal data, please try again.");
+			}
 		}
 		return _empty;
 	}
@@ -152,7 +162,11 @@ public class SCRSImpl implements SCRS{
 	public List<ArrayList<String>> queryInstructor(Token token, int instructorID) {
 		if(token.type != RoleType.UNDEFINED && token.type != RoleType.STUDENT)
 		{
-			return admin.queryInstructor(instructorID);
+			try {
+				return admin.queryAdminPersonalData(token);
+			} catch (ClassNotFoundException | SQLException e) {
+				System.err.println("Unable to perform query operation. Please try again.");
+			}
 		}
 		return _empty;
 	}
@@ -171,7 +185,14 @@ public class SCRSImpl implements SCRS{
 	public boolean studentAddClass(Token token, int courseID, String grading, String courseTerm) {
 		Student student = new Student();
 		if(token.type != RoleType.UNDEFINED && token.type != RoleType.ADMIN){
-			return student.studentAddClass(token, courseID, grading, courseTerm);
+			try {
+				return student.studentAddClass(token, courseID, grading, courseTerm);
+			} catch (ClassNotFoundException | ParseException | SQLException e) {
+				System.err.println("Unable to add student to class, please try again.");
+			} catch (NotWithinTimeFrameException e)
+			{
+				System.err.println("Sorry, you are not within registation time frame.");
+			}
 		}
 		//authentication failed
 		return false;
@@ -188,7 +209,13 @@ public class SCRSImpl implements SCRS{
 	@Override
 	public boolean studentDropClass(Token token, int courseID) {
 		if(token.type != RoleType.UNDEFINED && token.type != RoleType.ADMIN){
-			return student.studentDropClass(token.id, courseID);
+			try {
+				return student.studentDropClass(token, courseID);
+			} catch (ClassNotFoundException | ParseException | SQLException e) {
+				System.err.println("Unable to drop student from the class, please try again.");
+			} catch (NotWithinTimeFrameException e) {
+				System.err.println("Sorry, you are not within drop time frame.");
+			}
 		}
 		return false;
 	}
@@ -204,7 +231,13 @@ public class SCRSImpl implements SCRS{
 	@Override
 	public boolean studentEditClass(Token token, int courseID, String grading, String courseTerm) {
 		if(token.type != RoleType.UNDEFINED && token.type != RoleType.ADMIN){
-			return student.studentEditClass(token.id, courseID, grading, courseTerm);
+			try {
+				return student.studentEditClass(token, courseID, grading, courseTerm);
+			} catch (ClassNotFoundException | ParseException | SQLException e) {
+				System.err.println("Unable to edit student registration, please try again.");
+			} catch (NotWithinTimeFrameException e) {
+				System.err.println("Sorry, you are not within edit time frame.");
+			}
 		}
 		return false;
 	}
@@ -232,13 +265,16 @@ public class SCRSImpl implements SCRS{
 	 * @return Return true if the operation is successfully, false otherwise
 	 */
 	@Override
-	public boolean adminAddClass(Token token, int courseID, String courseName, int courseCredits, String instructor,
-			String firstDay, String lastDay, String classBeginTime, String classEndTime, String weekDays,
-			String location, String type, String prerequisite, String description, String department) {
+	public boolean adminAddClass(Token token, int courseID, String courseName, int courseCredits, int courseCapacity,
+			String term, int instructorID, String firstDay, String lastDay, String classBeginTime, String classEndTime,
+			String weekDays, String location, String type, String prerequisite, String description, String department) {
 		if(token.type != RoleType.UNDEFINED && token.type != RoleType.STUDENT){
-			return admin.adminAddClass(token, courseID, courseName, courseCredits,
-					instructor, firstDay, lastDay, classBeginTime, classEndTime, 
-					weekDays, location, type, prerequisite, description, department);
+			try {
+				return admin.adminAddClass(token, courseID, courseName, courseCredits, courseCapacity, 
+						term, instructorID, firstDay, lastDay, classBeginTime, classEndTime, weekDays, location, type, prerequisite, description, department);
+			} catch (ClassNotFoundException | SQLException | ParseException e) {
+				System.err.println("Unable to perform add operation. Please try again.");
+			}
 		}
 		return false;
 	}
@@ -252,7 +288,11 @@ public class SCRSImpl implements SCRS{
 	@Override
 	public boolean adminDeleteClass(Token token, int courseID) {
 		if(token.type != RoleType.UNDEFINED && token.type != RoleType.STUDENT){
-			return admin.adminDeleteClass(token, courseID);
+			try {
+				return admin.adminDeleteClass(token, courseID);
+			} catch (ClassNotFoundException | SQLException | ParseException e) {
+				System.err.println("Unable to perform delete operation. Please try again.");
+			}
 		}
 		return false;
 	}
@@ -283,9 +323,12 @@ public class SCRSImpl implements SCRS{
 			String firstDay, String lastDay, String classBeginTime, String classEndTime, String weekDays,
 			String location, String type, String prerequisite, String description, String department) {
 		if(token.type != RoleType.UNDEFINED && token.type != RoleType.STUDENT){
-			return admin.adminEditClass(token, courseID, courseName, courseCredits, 
-										instructor, firstDay, lastDay, classBeginTime, 
-										classEndTime, weekDays, location, type, prerequisite, description, department);
+			try {
+				return admin.adminEditClass(token, courseID, courseName, courseCredits, instructorID, firstDay, lastDay,
+						classBeginTime, classEndTime, weekDays, location, type, prerequisite, description, department);
+			} catch (ClassNotFoundException | SQLException | ParseException e) {
+				System.err.println("Unable to perform edit operation. Please try again.");
+			}
 		}
 		return false;
 	}
@@ -302,7 +345,11 @@ public class SCRSImpl implements SCRS{
 	@Override
 	public boolean adminAddStudentToClass(Token token, int studentID, int courseID, String grading, String courseTerm) {
 		if(token.type != RoleType.UNDEFINED && token.type != RoleType.STUDENT){
-			return admin.adminAddStudentToClass(token, studentID, courseID, grading, courseTerm);
+			try {
+				return admin.adminAddStudentToClass(token, studentID, courseID, grading, courseTerm);
+			} catch (ClassNotFoundException | SQLException | ParseException e) {
+				System.err.println("Unable to perform add student to class operation. Please try again.");
+			}
 		}
 		return false;
 	}
@@ -320,7 +367,11 @@ public class SCRSImpl implements SCRS{
 	public boolean adminEditStudentRegisteredClass(Token token, int studentID, int courseID, String grading,
 			String courseTerm) {
 		if(token.type != RoleType.UNDEFINED && token.type != RoleType.STUDENT){
-			return admin.adminEditStudentRegisteredClass(token, studentID, courseID, grading, courseTerm);
+			try {
+				return admin.adminEditStudentRegisteredClass(token, studentID, courseID, grading, courseTerm);
+			} catch (ClassNotFoundException | SQLException | ParseException e) {
+				System.err.println("Unable to perform edit operation. Please try again.");
+			}
 		}
 		return false;
 	}
@@ -335,17 +386,12 @@ public class SCRSImpl implements SCRS{
 	@Override
 	public boolean adminDropStudentRegisteredClass(Token token, int studentID, int courseID) {
 		if(token.type != RoleType.UNDEFINED && token.type != RoleType.STUDENT){
-			return admin.adminDropStudentRegisteredClass(token, studentID, courseID);
+			try {
+				return admin.adminDropStudentRegisteredClass(token, studentID, courseID);
+			} catch (ClassNotFoundException | SQLException | ParseException e) {
+				System.err.println("Unable to perform drop operation. Please try again.");
+			}
 		}
-		return false;
-	}
-
-
-	@Override
-	public boolean adminAddClass(Token token, int courseID, String courseName, int courseCredits, int courseCapacity,
-			String term, int instructorID, String firstDay, String lastDay, String classBeginTime, String classEndTime,
-			String weekDays, String location, String type, String prerequisite, String description, String department) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
