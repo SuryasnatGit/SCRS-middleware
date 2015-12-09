@@ -29,10 +29,9 @@ public final class DBProcessor {
 	 */
 	public static ArrayList<ArrayList<String>> toStringArray(List<ArrayList<Object>> ObjectLists) {
 		ArrayList<ArrayList<String>> listOfStrList = new ArrayList<ArrayList<String>>();
-		ArrayList<String> strList = new ArrayList<String>();
 		for(ArrayList<Object> Objects : ObjectLists)
         {
-        	strList.clear();
+			ArrayList<String> strList = new ArrayList<String>();
         	for( Object fields : Objects )
         	{
         		if (fields == null)

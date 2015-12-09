@@ -44,7 +44,7 @@ public class DBCoordinator {
 			throw new IllegalArgumentException("SQL contains non select command, such as Insert, Update, Delete.");
 
 		Class.forName("org.sqlite.JDBC");
-		con = DriverManager.getConnection("jdbc:sqlite:SCRSDataBase.db");
+		con = DriverManager.getConnection("jdbc:sqlite:resources/SCRSDataBase.db");
 		con.setAutoCommit(false);
 		//System.out.println("Opened database successfully");
 
@@ -88,7 +88,7 @@ public class DBCoordinator {
 			throw new IllegalArgumentException("SQL contains non select command, such as Insert, Update, Select.");
 
 		Class.forName("org.sqlite.JDBC");
-		con = DriverManager.getConnection("jdbc:sqlite:SCRSDataBase.db");
+		con = DriverManager.getConnection("jdbc:sqlite:resources/SCRSDataBase.db");
 		con.setAutoCommit(false);
 		System.out.println("Opened database successfully");
 
@@ -133,7 +133,7 @@ public class DBCoordinator {
 			throw new IllegalArgumentException("SQL contains non select command, such as Select, Update, Delete.");
 
 		Class.forName("org.sqlite.JDBC");
-		con = DriverManager.getConnection("jdbc:sqlite:SCRSDataBase.db");
+		con = DriverManager.getConnection("jdbc:sqlite:resources/SCRSDataBase.db");
 		con.setAutoCommit(false);
 		System.out.println("Opened database successfully");
 
@@ -181,7 +181,7 @@ public class DBCoordinator {
 			throw new IllegalArgumentException("SQL contains non select command, such as Insert, Select, Delete.");
 
 		Class.forName("org.sqlite.JDBC");
-		con = DriverManager.getConnection("jdbc:sqlite:SCRSDataBase.db");
+		con = DriverManager.getConnection("jdbc:sqlite:resources/SCRSDataBase.db");
 		con.setAutoCommit(false);
 		System.out.println("Opened database successfully");
 
