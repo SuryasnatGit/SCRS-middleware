@@ -41,9 +41,9 @@ public class SCRSImpl implements SCRS{
 	/**
 	 * This method is used to perform class queries or provide information to the GUI.
 	 * @param courseID can be used by administrator for fast class query
-	 * @param courseName
-	 * @param location
-	 * @param term
+	 * @param courseName   Mandatory Field
+	 * @param location     Mandatory Field
+	 * @param term		   Mandatory Field
 	 * @param department
 	 * @param classType
 	 * @param instructorName
@@ -54,12 +54,17 @@ public class SCRSImpl implements SCRS{
 	@Override
 	public List<ArrayList<String>> queryClass(int courseID, String courseName, String location, String term,
 			String department, String classType, String instructorName) {
+
+		if(location.isEmpty() || courseName.isEmpty() || term.isEmpty())
+		{
+			System.err.println("Location, Course Name and Term fields must not be empty.");
+			return _empty;
+		}
 		search = new Search();
 		try {
 			return search.searchClasses(courseID, courseName, location, term, department, classType, instructorName);
 		} catch (ClassNotFoundException | SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.err.println("Unable to perform search, please try again.");
 			return _empty;
 		}	
 	}
@@ -83,7 +88,11 @@ public class SCRSImpl implements SCRS{
 				if(token.id != studentID)
 					return _empty;
 			}
-			return student.queryStudentPersonalData(studentID);
+			try {
+				return student.queryStudentPersonalData(studentID);
+			} catch (ClassNotFoundException | SQLException e) {
+				System.err.println("Unable to query student personal data, please try again.");
+			}
 		}
 		//authentication failed or not a student
 		return _empty;
@@ -162,7 +171,7 @@ public class SCRSImpl implements SCRS{
 	public boolean studentAddClass(Token token, int courseID, String grading, String courseTerm) {
 		Student student = new Student();
 		if(token.type != RoleType.UNDEFINED && token.type != RoleType.ADMIN){
-			return student.studentAddClass(token.id, courseID, grading, courseTerm);
+			return student.studentAddClass(token, courseID, grading, courseTerm);
 		}
 		//authentication failed
 		return false;
@@ -270,7 +279,7 @@ public class SCRSImpl implements SCRS{
 	 * @return Return true if the operation is successfully, false otherwise
 	 */
 	@Override
-	public boolean adminEditClass(Token token, int courseID, String courseName, int courseCredits, String instructor,
+	public boolean adminEditClass(Token token, int courseID, String courseName, int courseCredits, int instructorID,
 			String firstDay, String lastDay, String classBeginTime, String classEndTime, String weekDays,
 			String location, String type, String prerequisite, String description, String department) {
 		if(token.type != RoleType.UNDEFINED && token.type != RoleType.STUDENT){
@@ -328,6 +337,15 @@ public class SCRSImpl implements SCRS{
 		if(token.type != RoleType.UNDEFINED && token.type != RoleType.STUDENT){
 			return admin.adminDropStudentRegisteredClass(token, studentID, courseID);
 		}
+		return false;
+	}
+
+
+	@Override
+	public boolean adminAddClass(Token token, int courseID, String courseName, int courseCredits, int courseCapacity,
+			String term, int instructorID, String firstDay, String lastDay, String classBeginTime, String classEndTime,
+			String weekDays, String location, String type, String prerequisite, String description, String department) {
+		// TODO Auto-generated method stub
 		return false;
 	}
 

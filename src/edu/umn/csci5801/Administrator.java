@@ -2,10 +2,7 @@ package edu.umn.csci5801;
 
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 public class Administrator extends People{
@@ -29,21 +26,21 @@ public class Administrator extends People{
 	}
 	
 
-		public List<ArrayList<String>> queryAdminPersonalData(ShibbolethAuth.Token token) throws ClassNotFoundException, SQLException{
-			List<ArrayList<String>> resultList;
-			
-			int instructorId = 0;
-			if (instructorId == -1){
-			String	sqlCmdAll = "Select * from instructor;";
-			resultList=DBProcessor.runQueryWithAge(sqlCmdAll);
-			}
-			else {
-				String sqlCmdOne = "Select * from instructor Where id = "+ instructorId +";";
-				resultList=DBProcessor.runQueryWithAge(sqlCmdOne);
-			}
-			System.out.println(resultList);
-			return resultList;
+	public List<ArrayList<String>> queryAdminPersonalData(ShibbolethAuth.Token token) throws ClassNotFoundException, SQLException{
+		List<ArrayList<String>> resultList;
+		
+		int instructorId = token.id;
+		if (instructorId == -1){
+		String	sqlCmdAll = "Select * from instructor;";
+		
+		resultList = DBProcessor.runQueryWithAge(sqlCmdAll);
 		}
+		else {
+			String sqlCmdOne = "Select * from instructor Where id = "+ instructorId +";";
+			resultList = DBProcessor.runQueryWithAge(sqlCmdOne);
+		}
+		return resultList;
+	}
 		
 	
 	/*
@@ -398,7 +395,6 @@ public class Administrator extends People{
 	boolean adminAddStudentToClass(ShibbolethAuth.Token token, int studentID, int courseID, String grading, String courseTerm) throws ClassNotFoundException, SQLException, ParseException{
 
 		boolean isValid = false;
-		Date date = new Date();
 		String sqlCmd;
 
 		
@@ -506,12 +502,9 @@ public class Administrator extends People{
 	 */
 	boolean adminDropStudentRegisteredClass(ShibbolethAuth.Token token, int studentID, int courseID) throws ClassNotFoundException, SQLException, ParseException{
 		boolean isValid = false;
-		Date date = new Date(); //get current date
+		
 		String sqlCmd;
 		
-		String sqlGetTerm = "select course.term from course where course.id = " + courseID;
-		String term = DBProcessor.getStringFromQuery(sqlGetTerm);
-				
 		String sqlCourseCredit = "select course.credits from course where course.Id = " + courseID;
 		int courseCredit = DBProcessor.getIntegerFromQuery(sqlCourseCredit);
 		

@@ -4,7 +4,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import edu.umn.csci5801.ShibbolethAuth.Token;
+
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 
 public class Student extends People {
@@ -17,33 +21,52 @@ public class Student extends People {
 	private List<ArrayList<String>> resultList;
 	private String sqlCmd;
 	
-	public Student() { 
-		department = "";
-		type = "";
-		currentCredits = 0;
-		plan = "";
-		status = "";
-		advisor = "";
+	public Student() {
 	}
 	
-	public List<ArrayList<String>> queryRegistrationHistory (int studentId)throws ClassNotFoundException,SQLException{
+	/**Delegate function that queries the SCRS Database for a student registration history.
+	 * Called by the SCRSImp class.
+	 * @param studentId
+	 * @return A list, which might be empty if there are no records in the database of the student ID
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 */
+	public List<ArrayList<String>> queryRegistrationHistory (int studentId) throws ClassNotFoundException,SQLException{
 		sqlCmd = "Select studentandcourse.id, course.name, studentandcourse.courseterm ,studentandcourse.grading " + 
-		"from course join StudentAndCourse where course.id = studentandcourse.courseid " +
-		"and studentID = " + studentId + ";";
+				 "from course join StudentAndCourse where course.id = studentandcourse.courseid " +
+				 "and studentID = " + studentId + ";";
 		resultList = DBProcessor.runQuery(sqlCmd);
 		return resultList;
 	}
 	
+	/**Delegate function that queries the SCRS Database for a student's personal data 
+	 * (e.g firstname, lastname, DOB, credts)
+	 * @param studentId
+	 * @return A list containing one element, which is another list that has the student's personal data
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 */
 	public List<ArrayList<String>> queryStudentPersonalData (int studentId) throws ClassNotFoundException, SQLException{
 		sqlCmd = "Select * from student where Id = " + studentId + ";";
-		resultList=DBProcessor.runQueryWithAge(sqlCmd);
+		resultList = DBProcessor.runQueryWithAge(sqlCmd);
 		return resultList;	
 	}
 	
-	public boolean studentAddClass (int studentId, int courseId, String grading, String courseTerm)throws ParseException, ClassNotFoundException, SQLException{
+	/**
+	 * @param studentId
+	 * @param courseId
+	 * @param grading
+	 * @param courseTerm
+	 * @return
+	 * @throws ParseException
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 */
+	public boolean studentAddClass (Token token, int courseId, String grading, String courseTerm)throws ParseException, ClassNotFoundException, SQLException{
 		boolean isValid = false;
-		Date date = new Date();
-
+		int studentId = token.id;
+		Date date = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").parse(token.timeStamp);
+		
 		String sqlGetTerm = "select course.term from course where course.id = " + courseId;
 		String term = DBProcessor.getStringFromQuery(sqlGetTerm);
 		
@@ -99,10 +122,21 @@ public class Student extends People {
 	}
 
 	//Make sure we passing student id from SCRS
-	public boolean studentEditClass(int studentId, int courseId, String grading, String courseTerm) throws ParseException, SQLException, ClassNotFoundException{
+	/**
+	 * @param studentId
+	 * @param courseId
+	 * @param grading
+	 * @param courseTerm
+	 * @return
+	 * @throws ParseException
+	 * @throws SQLException
+	 * @throws ClassNotFoundException
+	 */
+	public boolean studentEditClass(Token token, int courseId, String grading, String courseTerm) throws ParseException, SQLException, ClassNotFoundException{
 		boolean isValid = false;
-		Date date = new Date();
-	
+		int studentId = token.id;
+		Date date = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").parse(token.timeStamp);
+		
 		String sqlGetTerm = "select course.term from course where course.id = " + courseId;
 		String term = DBProcessor.getStringFromQuery(sqlGetTerm);
 			
@@ -125,9 +159,18 @@ public class Student extends People {
 	
 	
 	
-	public boolean studentDropClass (int studentId, int courseId)throws ParseException, SQLException, ClassNotFoundException{
+	/**
+	 * @param studentId
+	 * @param courseId
+	 * @return
+	 * @throws ParseException
+	 * @throws SQLException
+	 * @throws ClassNotFoundException
+	 */
+	public boolean studentDropClass (Token token, int courseId)throws ParseException, SQLException, ClassNotFoundException{
 		boolean isValid = false;
-		Date date = new Date(); //get current date
+		int studentId = token.id;
+		Date date = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").parse(token.timeStamp);
 		
 		String sqlGetTerm = "select course.term from course where course.id = " + courseId;
 		String term = DBProcessor.getStringFromQuery(sqlGetTerm);
